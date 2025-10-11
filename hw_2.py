@@ -1,7 +1,8 @@
-from debugpy.server.cli import switches
-
-
-def print_departmnet_structure(db):
+def print_department_structure(db):
+    '''Функция для вывода структуры департамента
+    в терминале. На вход подается словарь, содержащий
+    как ключи - номера строк, а как значения - строки
+    исходных данных в csv'''
     departments_db = {}
     for i in range(len(db) - 1):
         if db[i][1] not in departments_db:
@@ -16,6 +17,12 @@ def print_departmnet_structure(db):
 
 
 def dep_review(db, flag_to_print):
+    '''Функция для вывода отчета по департамента
+        в терминале. На вход подается словарь, содержащий
+        как ключи - номера строк, а как значения - строки
+        исходных данных в csv.
+        Также на вход подается флаг flag_to_print,
+        нужно ли выводить результат.'''
     dep_rev_db = {}
     for person in range(len(db) - 1):
         dep = db[person][1]
@@ -31,7 +38,7 @@ def dep_review(db, flag_to_print):
             dep_rev_db[dep]['sum_sal'] += salary_person
     for dep in dep_rev_db.keys():
         dep_rev_db[dep]['avg_sal'] = int(dep_rev_db[dep]['sum_sal'] / dep_rev_db[dep]['amount'])
-    if (flag_to_print):
+    if flag_to_print:
         for dep in dep_rev_db.keys():
             print(f'Департамент: {dep}\n численность: {dep_rev_db[dep]["amount"]} | '
                   f'мин. зп: {dep_rev_db[dep]["min_sal"]} | '
@@ -42,20 +49,23 @@ def dep_review(db, flag_to_print):
 
 
 def save_review_to_csv(db, file_name='review_output.csv'):
-    reslut_db = dep_review(db, flag_to_print=0)
-    dep = list(reslut_db.keys())[0]
-    print(reslut_db)
-    # print(reslut_db[str(dep)][0])
+    '''Функция сохраняет отчет, аналогичный из 2 пункта в файл csv.
+    На вход подается db - словарь, аналогичный прошлым функциям и
+    название для сохранения файла file_name.
+    '''
+    result_db = dep_review(db, flag_to_print=0)
+    dep = list(result_db.keys())[0]
+
     try:
         with open(file_name, 'w+', encoding='UTF-8') as file_output:
             columns = ['']
-            for key in reslut_db[dep].keys():
+            for key in result_db[dep].keys():
                 columns.append(key)
             file_output.write(','.join(columns) + '\n')
 
-            for dep in reslut_db.keys():
+            for dep in result_db.keys():
                 row = [dep]
-                for metric in reslut_db[dep].values():
+                for metric in result_db[dep].values():
                     row.append(str(metric))
                 file_output.write(','.join(row) + '\n')
     except FileNotFoundError:
@@ -68,15 +78,13 @@ def save_review_to_csv(db, file_name='review_output.csv'):
 
 
 if __name__ == '__main__':
-    # dep_review(database)
     database = {}
-
     with open('corp_data.csv', "r") as file:
-        # len_of_file = len(file.readlines()) - 1
-        # print(len_of_file)
-        file.readline().split(';')
-        for i in range(201):
-            database[i] = file.readline().split(';')
+        header = file.readline().split(';')
+        for i, line in enumerate(file):
+            if not line:
+                continue
+            database[i] = line.strip().split(';')
 
     while True:
         print("Меню:")
@@ -91,19 +99,18 @@ if __name__ == '__main__':
         except ValueError:
             print('Вы ввели неверный пункт меню. Для выхода введите 0')
 
-
         match choice:
             case 0:
                 print('Выход \n')
                 break
             case 1:
                 print('Иерархия команд \n')
-                print_departmnet_structure(database)
+                print_department_structure(database)
             case 2:
                 print('Сводный отчёт по департаментам \n')
                 dep_review(database, 1)
             case 3:
-                file = 'res_data.csv'
+                file = 'review_output.csv'
                 save_review_to_csv(database, file_name=file)
                 print(f'файл сохранен в {file} в директории проекта \n')
             case _:
