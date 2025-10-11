@@ -1,4 +1,4 @@
-def print_department_structure(db):
+def print_department_structure(db: list) -> int:
     '''Функция для вывода структуры департамента
     в терминале. На вход подается словарь, содержащий
     как ключи - номера строк, а как значения - строки
@@ -14,9 +14,10 @@ def print_department_structure(db):
     print()
     for dep in departments_db:
         print(f'Департамент: {dep} \nКоманды: {", ".join(departments_db[dep])} \n')
+    return 0
 
 
-def dep_review(db, flag_to_print):
+def dep_review(db: list, flag_to_print: bool) -> list:
     '''Функция для вывода отчета по департамента
         в терминале. На вход подается словарь, содержащий
         как ключи - номера строк, а как значения - строки
@@ -48,7 +49,7 @@ def dep_review(db, flag_to_print):
     return dep_rev_db
 
 
-def save_review_to_csv(db, file_name='review_output.csv'):
+def save_review_to_csv(db: list, file_name: str='review_output.csv') -> int:
     '''Функция сохраняет отчет, аналогичный из 2 пункта в файл csv.
     На вход подается db - словарь, аналогичный прошлым функциям и
     название для сохранения файла file_name.
