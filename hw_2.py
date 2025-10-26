@@ -1,8 +1,11 @@
-def print_department_structure(db: list) -> int:
-    '''Функция для вывода структуры департамента
-    в терминале. На вход подается словарь, содержащий
+def print_department_structure(db: dict[int, list[str]]) -> None:
+    '''Функция для вывода структуры департаментов в терминале.
+
+    На вход подается словарь, содержащий
     как ключи - номера строк, а как значения - строки
-    исходных данных в csv'''
+    исходных данных в csv.
+    Выводит в терминал структуры департаментов
+    '''
     departments_db = {}
     num_of_items = len(db) - 1
     for i in range(num_of_items):
@@ -14,25 +17,37 @@ def print_department_structure(db: list) -> int:
 
     print()
     for dep in departments_db:
-        print(f'Департамент: {dep} \nКоманды: {", ".join(departments_db[dep])} \n')
-    return None
+        print(f'Департамент: {dep} \nКоманды: '
+              f'{", ".join(departments_db[dep])} \n')
 
 
-def dep_review(db: list, flag_to_print: bool) -> list:
-    '''Функция для вывода отчета по департаментам
-    в терминале. На вход подается словарь, содержащий
+def dep_review(db: dict[int, list[str]], flag_to_print: bool) -> dict[str, dict[str, int]]:
+    '''Функция для вывода отчета по департаментам в терминале.
+
+    На вход подается словарь, содержащий
     как ключи - номера строк, а как значения - строки
     исходных данных в csv.
     Также на вход подается флаг flag_to_print,
-    нужно ли выводить результат.'''
+    нужно ли выводить результат.
+
+    Функция возвращает словарь с ключом - названием
+    департамента (тип str) и значением - словарем
+    с ключом - характеристикой департамента (str)и ее
+    численным значением (int)
+    '''
     dep_rev_db = {}
     num_of_items = len(db) - 1
     for person in range(num_of_items):
         dep = db[person][1]
         salary_person = int(db[person][5])
         if dep not in dep_rev_db.keys():
-            dep_rev_db[dep] = {'amount': 1, 'min_sal': salary_person, 'max_sal': salary_person,
-                               'avg_sal': salary_person, 'sum_sal': salary_person}
+            dep_rev_db[dep] = {
+                'amount': 1,
+                'min_sal': salary_person,
+                'max_sal': salary_person,
+                'avg_sal': salary_person,
+                'sum_sal': salary_person
+            }
         else:
             dep_rev_db[dep]['amount'] = dep_rev_db[dep]['amount'] + 1
             if salary_person < dep_rev_db[dep]['min_sal']:
@@ -41,26 +56,32 @@ def dep_review(db: list, flag_to_print: bool) -> list:
                 dep_rev_db[dep]['max_sal'] = salary_person
             dep_rev_db[dep]['sum_sal'] += salary_person
     for dep in dep_rev_db.keys():
-        dep_rev_db[dep]['avg_sal'] = int(dep_rev_db[dep]['sum_sal'] / dep_rev_db[dep]['amount'])
+        dep_rev_db[dep]['avg_sal'] = int(dep_rev_db[dep]['sum_sal']
+                                         / dep_rev_db[dep]['amount'])
     if flag_to_print:
         for dep in dep_rev_db.keys():
-            print(f'Департамент: {dep}\n численность: {dep_rev_db[dep]["amount"]} | '
+            print(f'Департамент: {dep}\n численность: '
+                  f'{dep_rev_db[dep]["amount"]} | '
                   f'мин. зп: {dep_rev_db[dep]["min_sal"]} | '
                   f'макс зп: {dep_rev_db[dep]["max_sal"]} | '
                   f'средн. зп: {dep_rev_db[dep]["avg_sal"]}')
-            dep_rev_db[dep]['avg_sal'] = int(dep_rev_db[dep]['sum_sal'] / dep_rev_db[dep]['amount'])
     return dep_rev_db
 
 
-def save_review_to_csv(db: list, file_name: str = 'review_output.csv') -> int:
+def save_review_to_csv(db: dict[int, list[str]], file_name: str = 'review_output.csv') -> None:
     '''Функция сохраняет отчет, аналогичный из 2 пункта в файл csv.
+
     На вход подается db - словарь, аналогичный прошлым функциям и
-    название для сохранения файла file_name.'''
+    название для сохранения файла file_name.
+
+    Функция сохраняет отчет в формате csv в текущую директорию
+    в кодировке utf-8
+    '''
     result_db = dep_review(db, flag_to_print=0)
     dep = list(result_db.keys())[0]
 
     try:
-        with open(file_name, 'w+', encoding='UTF-8') as file_output:
+        with open(file_name, 'w+', encoding='utf-8') as file_output:
             columns = ['']
             for key in result_db[dep].keys():
                 columns.append(key)
@@ -77,7 +98,6 @@ def save_review_to_csv(db: list, file_name: str = 'review_output.csv') -> int:
         print('Нет доступа к файлу.')
     except Exception as e:
         print(f'Неожиданная ошибка: {e}')
-    return 0
 
 
 if __name__ == '__main__':
@@ -91,8 +111,11 @@ if __name__ == '__main__':
 
     while True:
         print('Меню:')
-        print('1. Вывести в понятном виде иерархию команд, т.е. департамент и все команды, которые входят в него')
-        print('2. Вывести сводный отчёт по департаментам: название, численность, "вилка" зарплат в виде мин – макс, среднюю зарплату')
+        print('1. Вывести в понятном виде иерархию команд, т.е. департамент'
+              ' и все команды, которые входят в него')
+        print('2. Вывести сводный отчёт по департаментам: название, '
+              'численность, "вилка" зарплат в виде мин – макс, среднюю '
+              'зарплату')
         print('3. Сохранить сводный отчёт')
         print('0. Выход')
 
