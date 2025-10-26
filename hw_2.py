@@ -4,7 +4,8 @@ def print_department_structure(db: list) -> int:
     как ключи - номера строк, а как значения - строки
     исходных данных в csv'''
     departments_db = {}
-    for i in range(len(db) - 1):
+    num_of_items = len(db) - 1
+    for i in range(num_of_items):
         if db[i][1] not in departments_db:
             departments_db[db[i][1]] = [db[i][2]]
         else:
@@ -14,24 +15,26 @@ def print_department_structure(db: list) -> int:
     print()
     for dep in departments_db:
         print(f'Департамент: {dep} \nКоманды: {", ".join(departments_db[dep])} \n')
-    return 0
+    return None
 
 
 def dep_review(db: list, flag_to_print: bool) -> list:
-    '''Функция для вывода отчета по департамента
-        в терминале. На вход подается словарь, содержащий
-        как ключи - номера строк, а как значения - строки
-        исходных данных в csv.
-        Также на вход подается флаг flag_to_print,
-        нужно ли выводить результат.'''
+    '''Функция для вывода отчета по департаментам
+    в терминале. На вход подается словарь, содержащий
+    как ключи - номера строк, а как значения - строки
+    исходных данных в csv.
+    Также на вход подается флаг flag_to_print,
+    нужно ли выводить результат.'''
     dep_rev_db = {}
-    for person in range(len(db) - 1):
+    num_of_items = len(db) - 1
+    for person in range(num_of_items):
         dep = db[person][1]
         salary_person = int(db[person][5])
         if dep not in dep_rev_db.keys():
-            dep_rev_db[dep] = {'amount':1, 'min_sal':salary_person, 'max_sal':salary_person, 'avg_sal':salary_person, 'sum_sal':salary_person}
+            dep_rev_db[dep] = {'amount': 1, 'min_sal': salary_person, 'max_sal': salary_person,
+                               'avg_sal': salary_person, 'sum_sal': salary_person}
         else:
-            dep_rev_db[dep]['amount'] = dep_rev_db[dep]['amount']  + 1
+            dep_rev_db[dep]['amount'] = dep_rev_db[dep]['amount'] + 1
             if salary_person < dep_rev_db[dep]['min_sal']:
                 dep_rev_db[dep]['min_sal'] = salary_person
             if salary_person > dep_rev_db[dep]['max_sal']:
@@ -49,11 +52,10 @@ def dep_review(db: list, flag_to_print: bool) -> list:
     return dep_rev_db
 
 
-def save_review_to_csv(db: list, file_name: str='review_output.csv') -> int:
+def save_review_to_csv(db: list, file_name: str = 'review_output.csv') -> int:
     '''Функция сохраняет отчет, аналогичный из 2 пункта в файл csv.
     На вход подается db - словарь, аналогичный прошлым функциям и
-    название для сохранения файла file_name.
-    '''
+    название для сохранения файла file_name.'''
     result_db = dep_review(db, flag_to_print=0)
     dep = list(result_db.keys())[0]
 
@@ -70,17 +72,17 @@ def save_review_to_csv(db: list, file_name: str='review_output.csv') -> int:
                     row.append(str(metric))
                 file_output.write(','.join(row) + '\n')
     except FileNotFoundError:
-        print("Файл не найден.")
+        print('Файл не найден.')
     except PermissionError:
-        print("Нет доступа к файлу.")
+        print('Нет доступа к файлу.')
     except Exception as e:
-        print(f"Неожиданная ошибка: {e}")
+        print(f'Неожиданная ошибка: {e}')
     return 0
 
 
 if __name__ == '__main__':
     database = {}
-    with open('corp_data.csv', "r") as file:
+    with open('corp_data.csv', 'r', encoding='windows-1251') as file:
         header = file.readline().split(';')
         for i, line in enumerate(file):
             if not line:
@@ -88,31 +90,30 @@ if __name__ == '__main__':
             database[i] = line.strip().split(';')
 
     while True:
-        print("Меню:")
-        print("1. Вывести в понятном виде иерархию команд, т.е. департамент и все команды, которые входят в него")
-        print('2. Вывести сводный отчёт по департаментам: название, численность, "вилка" зарплат в виде мин – '
-                                                                                        '"макс", среднюю зарплату')
-        print("3. Сохранить сводный отчёт")
-        print("0. Выход")
+        print('Меню:')
+        print('1. Вывести в понятном виде иерархию команд, т.е. департамент и все команды, которые входят в него')
+        print('2. Вывести сводный отчёт по департаментам: название, численность, "вилка" зарплат в виде мин – макс, среднюю зарплату')
+        print('3. Сохранить сводный отчёт')
+        print('0. Выход')
 
         try:
-            choice = int(input('Введите пункт:'))
+            choice = int(input('Введите пункт: '))
         except ValueError:
             print('Вы ввели неверный пункт меню. Для выхода введите 0')
 
         match choice:
             case 0:
-                print('Выход \n')
+                print('Выход\n')
                 break
             case 1:
-                print('Иерархия команд \n')
+                print('Иерархия команд\n')
                 print_department_structure(database)
             case 2:
-                print('Сводный отчёт по департаментам \n')
+                print('Сводный отчёт по департаментам\n')
                 dep_review(database, 1)
             case 3:
                 file = 'review_output.csv'
                 save_review_to_csv(database, file_name=file)
-                print(f'файл сохранен в {file} в директории проекта \n')
+                print(f'Файл сохранён в {file} в директории проекта\n')
             case _:
-                print("Неправильный ввод. Введите еще раз \n")
+                print('Неправильный ввод. Введите ещё раз\n')
