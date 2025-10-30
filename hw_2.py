@@ -7,13 +7,12 @@ def print_department_structure(db: dict[int, list[str]]) -> None:
     Выводит в терминал структуры департаментов
     '''
     departments_db = {}
-    num_of_items = len(db) - 1
-    for i in range(num_of_items):
-        if db[i][1] not in departments_db:
-            departments_db[db[i][1]] = [db[i][2]]
+    for key, data_line in db.items():
+        if data_line[1] not in departments_db:
+            departments_db[data_line[1]] = [data_line[1]]
         else:
-            if db[i][2] not in departments_db[db[i][1]]:
-                departments_db[db[i][1]].append(db[i][2])
+            if data_line[2] not in departments_db[data_line[1]]:
+                departments_db[data_line[1]].append(data_line[2])
 
     print()
     for dep in departments_db:
@@ -36,10 +35,9 @@ def dep_review(db: dict[int, list[str]], flag_to_print: bool) -> dict[str, dict[
     численным значением (int)
     '''
     dep_rev_db = {}
-    num_of_items = len(db) - 1
-    for person in range(num_of_items):
-        dep = db[person][1]
-        salary_person = int(db[person][5])
+    for key, data_line in db.items():
+        dep = data_line[1]
+        salary_person = int(data_line[5])
         if dep not in dep_rev_db.keys():
             dep_rev_db[dep] = {
                 'amount': 1,
@@ -82,7 +80,7 @@ def save_review_to_csv(db: dict[int, list[str]], file_name: str = 'review_output
 
     try:
         with open(file_name, 'w+', encoding='utf-8') as file_output:
-            columns = ['']
+            columns = []
             for key in result_db[dep].keys():
                 columns.append(key)
             file_output.write(','.join(columns) + '\n')
